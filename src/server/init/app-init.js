@@ -11,6 +11,7 @@ import compress from 'koa-compress'
 import ua from '../utils/ua'
 import commonMiddleware from './common-middleware'
 import {err} from '../utils/log'
+import initRoutes from './routes'
 
 const local = CONFIG.site
 const env = local.env
@@ -47,7 +48,12 @@ export default function init() {
     ctx.set('Pragma', 'no-cache')
     await next()
   })
-  app.use(mount('/_bc', serve(cwd + '/node_modules', staticOption())))
+  app.use(
+    mount('/_bc', serve(cwd + '/node_modules', staticOption()))
+  )
+  app.use(
+    mount('/data', serve(cwd + '/data', staticOption()))
+  )
 
   // body
   app.use(bodyparser)
@@ -99,6 +105,7 @@ export default function init() {
     app: app // equals to pug.use(app) and app.use(pug.middleware)
   })
 
+  initRoutes(app)
 
   return app
 }

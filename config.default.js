@@ -1,21 +1,19 @@
 const os = require('os')
 const extend = require('recursive-assign')
+const packInfo = require('./package.json')
+
 let config = {
-
   site: {
-
     env: process.env.NODE_ENV || 'development',
-
-    siteName: 'electerm'
-
+    siteName: packInfo.name
   },
-
-  test: false,
-  host: '0.0.0.0',
+  host: 'localhost',
   port: process.env.PORT || 4370,
   devCPUCount: os.cpus().length,
   pkg: require('./package'),
-  devPort: 5370
+  devPort: 5370,
+  awsServer: 'us-east-1',
+  VoiceId: 'Amy'
 }
 
 try {

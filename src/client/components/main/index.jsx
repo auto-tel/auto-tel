@@ -1,6 +1,9 @@
 import React from 'react'
-import {Button, Row, Col} from 'antd'
+import {Button, Card} from 'antd'
 import SIP from 'sip.js'
+import Polly from 'aws-sdk/lib/services/polly'
+import './main.styl'
+console.log(Polly)
 
 function getCookie(key) {
   /* eslint-disable-next-line */
@@ -27,12 +30,18 @@ export default class ErrorBoundary extends React.Component {
     this.init()
   }
 
+  componentWillUnmount() {
+    this.users.forEach(user => {
+      this[`session_${user}`].stop()
+    })
+  }
+
   users = ['alice', 'bob']
 
   initUser = (user, removeElemId) => {
     let remoteVideoElement = document.getElementById(removeElemId)
     let domain = 'sipjs.onsip.com'
-    let uri = `${user}.${window.token}@${domain}`
+    let uri = `${user}.${this.token}@${domain}`
     let configuration = {
       media: {
         remote: {
@@ -47,6 +56,7 @@ export default class ErrorBoundary extends React.Component {
         userAgentString: SIP.C.USER_AGENT + ' sipjs.com'
       }
     }
+    //let ua = new SIP.UA(configuration.ua)
     let simple = new SIP.Web.Simple(configuration)
 
     // Adjust the style of the demo based on what is happening
@@ -69,8 +79,24 @@ export default class ErrorBoundary extends React.Component {
     simple.on('ringing', () => {
       simple.answer()
     })
+
+    simple.on('trackAdded', this.onTrackAdded)
     this[`uri_${user}`] = uri
     this[`session_${user}`] = simple
+  }
+
+  onTrackAdded = () => {
+    this.log('track add')
+  }
+
+  log = (...msgs) => {
+    this.setState(old => {
+      old.logs = [
+        ...old.logs,
+        msgs
+      ]
+      return old
+    })
   }
 
   getOtherName = name => {
@@ -95,7 +121,7 @@ export default class ErrorBoundary extends React.Component {
       document.cookie = 'onsipToken=' +
         token + ';' + 'expires=' + d.toUTCString() + ';'
     }
-    window.token = token
+    this.token = token
     this.users.forEach(user => {
       let otherUser = this.getOtherName(user)
       this.initUser(user, `video-of-${otherUser}`)
@@ -120,7 +146,7 @@ export default class ErrorBoundary extends React.Component {
   renderSection = (name) => {
     let tag = this.state.buttonTag[name] || 'start'
     return (
-      <Col cols={12}>
+      <Card className="mg1b">
         <div class="demo-view pd1y">
           <video id={`video-of-${name}`} muted="muted" />
         </div>
@@ -132,25 +158,33 @@ export default class ErrorBoundary extends React.Component {
           </Button>
         </div>
         <h4>{name}'s View</h4>
-      </Col>
+      </Card>
     )
   }
 
   render() {
     return (
-      <div>
+      <div className="main">
         <h1>auto-tel</h1>
         <div id="content-video-audio">
-          <h2>Video Chat demo</h2>
-          <h4 class="intro">Here's a demo. Start a video chat between Alice and Bob.</h4>
-          <div id="log" />
-          <Row>
+          <div id="log">
+            {
+              this.state.logs.map(items => {
+                return (
+                  <p>
+                    {items.join(', ')}
+                  </p>
+                )
+              })
+            }
+          </div>
+          <div>
             {
               this.users.map(user => {
                 return this.renderSection(user)
               })
             }
-          </Row>
+          </div>
         </div>
       </div>
     )
