@@ -4,6 +4,7 @@ const {identity} = require('lodash')
 const sysConfigDefault = require('./src/server/config')
 const packThreadCount = sysConfigDefault.devCPUCount // number
 const BabiliPlugin = require('babili-webpack-plugin')
+const OpenBrowserPlugin = require('open-browser-webpack-plugin')
 const HappyPack = require('happypack')
 const happyThreadPool = packThreadCount === 0 ? null : HappyPack.ThreadPool({ size: packThreadCount })
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -47,7 +48,7 @@ const stylusSettingPlugin =  new webpack.LoaderOptionsPlugin({
 var config = {
   mode: 'development',
   entry: {
-    auto-tel: './src/client/entry/index.jsx',
+    'auto-tel': './src/client/entry/index.jsx',
     basic: './src/client/entry/basic.jsx',
     index: './src/views/index.pug'
   },
@@ -155,7 +156,9 @@ var config = {
   devtool: '#eval-source-map',
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
-    //commonsChunkPlugin,
+    new OpenBrowserPlugin({
+      url: `http://localhost:${sysConfigDefault.devPort}`
+    }),
     new LodashModuleReplacementPlugin(),
     stylusSettingPlugin,
     packThreadCount === 0 ? null : new HappyPack(happyConf),

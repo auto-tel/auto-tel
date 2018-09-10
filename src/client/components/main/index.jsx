@@ -47,10 +47,10 @@ export default class ErrorBoundary extends React.Component {
         userAgentString: SIP.C.USER_AGENT + ' sipjs.com'
       }
     }
-    let simple = new SIP.WebRTC.Simple(configuration)
+    let simple = new SIP.Web.Simple(configuration)
 
     // Adjust the style of the demo based on what is happening
-    simple.on('ended', function() {
+    simple.on('ended', () => {
       remoteVideoElement.style.visibility = 'hidden'
       this.setState(old => {
         old.buttonTag[user] = 'start'
@@ -58,7 +58,7 @@ export default class ErrorBoundary extends React.Component {
       })
     })
 
-    simple.on('connected', function() {
+    simple.on('connected', () => {
       remoteVideoElement.style.visibility = 'visible'
       this.setState(old => {
         old.buttonTag[user] = 'hung up'
@@ -66,7 +66,7 @@ export default class ErrorBoundary extends React.Component {
       })
     })
 
-    simple.on('ringing', function() {
+    simple.on('ringing', () => {
       simple.answer()
     })
     this[`uri_${user}`] = uri
@@ -108,8 +108,8 @@ export default class ErrorBoundary extends React.Component {
     let otherName = this.getOtherName(name)
     let targetURI = this[`uri_${otherName}`]
     if (
-      state === SIP.WebRTC.Simple.C.STATUS_NULL ||
-      state === SIP.WebRTC.Simple.C.STATUS_COMPLETED
+      state === SIP.Web.Simple.C.STATUS_NULL ||
+      state === SIP.Web.Simple.C.STATUS_COMPLETED
     ) {
       simple.call(targetURI)
     } else {
