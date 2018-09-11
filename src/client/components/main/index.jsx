@@ -53,9 +53,6 @@ export default class Main extends React.Component {
     let ua = this[`ua_${user}`]
     let otherName = this.getOtherName(user)
     let targetURI = this[`uri_${otherName}`]
-    if (ua.isRegistered()) {
-      alert('reg done:' + user)
-    }
     let sess = ua.invite(targetURI)
     this[`session_${user}`] = sess
     this.initSessEvt(user)
@@ -65,8 +62,7 @@ export default class Main extends React.Component {
     // We need to check the peer connection to determine which track was added
     let pc = sess.sessionDescriptionHandler.peerConnection
     let localVideo = document.getElementById(`video-of-${user}`)
-    let otherUser = this.getOtherName(user)
-    let remoteVideo = document.getElementById(`video-of-${otherUser}`)
+    let localAudio = document.getElementById(`hide-audio-${user}`)
 
     // Gets remote tracks
     var remoteStream = new MediaStream()
@@ -78,24 +74,26 @@ export default class Main extends React.Component {
       remoteStream = pc.getRemoteStreams()[0]
     }
 
-    remoteVideo.srcObject = remoteStream
-    remoteVideo.play().catch(function() {
-      sess.logger.log('local play was rejected')
-    })
-
-    let localStream = new MediaStream()
-    if(pc.getSenders){
-      pc.getSenders().forEach(function(sender) {
-        let {track} = sender
-        localStream.addTrack(track)
-      })
-    } else{
-      localStream = pc.getLocalStreams()[0]
-    }
-    localVideo.srcObject = localStream
+    localVideo.srcObject = remoteStream
     localVideo.play().catch(function() {
       sess.logger.log('local play was rejected')
     })
+
+    if (localAudio.src) {
+      localAudio.onplay = () => {
+        let stream = localAudio.captureStream()
+        let tracksToAdd = stream.getTracks()
+        let pc = sess.sessionDescriptionHandler.peerConnection
+        pc.getSenders().forEach(sender => {
+          pc.removeTrack(sender)
+        })
+        tracksToAdd.forEach(track => {
+          pc.addTrack(track)
+        })
+      }
+      localAudio.play()
+    }
+
   }
 
   initSessEvt = user => {
@@ -131,10 +129,9 @@ export default class Main extends React.Component {
       autostart: true,
       userAgentString: SIP.C.USER_AGENT + ' sipjs.com'
     }
-    let ua = new SIP.UA(configuration.ua)
+    let ua = new SIP.UA(configuration)
 
     ua.on('registered', () => {
-      alert('registered:' + user)
       this.log('registered', user)
     })
     ua.on('invite', (session) => {
@@ -142,7 +139,7 @@ export default class Main extends React.Component {
       this[`session_${user}`] = session
       this.initSessEvt(user)
     })
-    ua.start()
+
     this[`ua_${user}`] = ua
     this[`uri_${user}`] = uri
   }
@@ -197,6 +194,9 @@ export default class Main extends React.Component {
     })
     let text = this.state.text[name]
     let audioURI = await getVoiceFromText(text)
+    this.setState(old => {
+      old.isLoading[name] = false
+    })
     if (!audioURI) {
       return
     }
@@ -205,6 +205,22 @@ export default class Main extends React.Component {
       `hide-audio-${name}`
     )
     audioElem.src = audioURI
+    audioElem.onplay = () => {
+      let stream = audioElem.captureStream()
+      let tracksToAdd = stream.getTracks()
+      let sess = this[`session_${name}`]
+      if (!sess) {
+        return
+      }
+      let pc = sess.sessionDescriptionHandler.peerConnection
+      pc.getSenders().forEach(sender => {
+        pc.removeTrack(sender)
+      })
+      tracksToAdd.forEach(track => {
+        pc.addTrack(track)
+      })
+    }
+    audioElem.play()
     console.log(audioElem)
   }
 
