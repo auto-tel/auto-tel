@@ -19,6 +19,12 @@ export default async (ctx, next) => {
 
   if (!local.cdn) ctx.local.cdn = host
 
+  if (ctx.path.startsWith('/api/')) {
+    ctx.q = ctx.query.q
+      ? JSON.parse(ctx.query.q)
+      : JSON.parse(ctx.request.body.q)
+  }
+
   await next()
 
 }

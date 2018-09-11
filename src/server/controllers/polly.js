@@ -2,10 +2,10 @@
  * aws polly api handler
  */
 
-import Polly from '../services/polly'
+import * as Polly from '../services/polly'
 
-export default async (ctx) => {
-  let {text} = ctx.query
+export const polly = async (ctx) => {
+  let {text} = ctx.q
   let uri = await Polly.getAudioResouce(text, ctx.local.cdn)
-  ctx.body = uri
+  ctx.body = {uri}
 }

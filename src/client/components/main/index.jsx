@@ -1,9 +1,8 @@
 import React from 'react'
-import {Button, Card} from 'antd'
+import {Button, Card, Input, Icon} from 'antd'
 import SIP from 'sip.js'
-import Polly from 'aws-sdk/lib/services/polly'
+import {getVoiceFromText} from '../../common/get-data'
 import './main.styl'
-console.log(Polly)
 
 function getCookie(key) {
   /* eslint-disable-next-line */
@@ -19,10 +18,13 @@ function randomString(length, chars) {
   return result
 }
 
-export default class ErrorBoundary extends React.Component {
+export default class Main extends React.Component {
 
   state = {
     logs: [],
+    text: {},
+    connected: {},
+    isLoading: {},
     buttonTag: {}
   }
 
@@ -32,61 +34,117 @@ export default class ErrorBoundary extends React.Component {
 
   componentWillUnmount() {
     this.users.forEach(user => {
-      this[`session_${user}`].stop()
+      this[`session_${user}`].terminate()
     })
   }
 
   users = ['alice', 'bob']
 
-  initUser = (user, removeElemId) => {
-    let remoteVideoElement = document.getElementById(removeElemId)
+  onClickName = name => {
+    let connected = !!this.state.connected[name]
+    if (connected) {
+      this[`session_${name}`].terminate()
+    } else {
+      this.initSession(name)
+    }
+  }
+
+  initSession = (user) => {
+    let ua = this[`ua_${user}`]
+    let otherName = this.getOtherName(user)
+    let targetURI = this[`uri_${otherName}`]
+    if (ua.isRegistered()) {
+      alert('reg done:' + user)
+    }
+    let sess = ua.invite(targetURI)
+    this[`session_${user}`] = sess
+    this.initSessEvt(user)
+  }
+
+  updateMedia = (user, sess) => {
+    // We need to check the peer connection to determine which track was added
+    let pc = sess.sessionDescriptionHandler.peerConnection
+    let localVideo = document.getElementById(`video-of-${user}`)
+    let otherUser = this.getOtherName(user)
+    let remoteVideo = document.getElementById(`video-of-${otherUser}`)
+
+    // Gets remote tracks
+    var remoteStream = new MediaStream()
+    if (pc.getReceivers) {
+      pc.getReceivers().forEach(function(receiver) {
+        remoteStream.addTrack(receiver.track)
+      })
+    } else {
+      remoteStream = pc.getRemoteStreams()[0]
+    }
+
+    remoteVideo.srcObject = remoteStream
+    remoteVideo.play().catch(function() {
+      sess.logger.log('local play was rejected')
+    })
+
+    let localStream = new MediaStream()
+    if(pc.getSenders){
+      pc.getSenders().forEach(function(sender) {
+        let {track} = sender
+        localStream.addTrack(track)
+      })
+    } else{
+      localStream = pc.getLocalStreams()[0]
+    }
+    localVideo.srcObject = localStream
+    localVideo.play().catch(function() {
+      sess.logger.log('local play was rejected')
+    })
+  }
+
+  initSessEvt = user => {
+    let sess = this[`session_${user}`]
+    sess.on('terminated', () => {
+      this.setState(old => {
+        old.connected[user] = false
+        return old
+      })
+    })
+    sess.on('accepted', () => {
+      //this.updateMedia(user, sess)
+      this.setState(old => {
+        old.connected[user] = true
+        return old
+      })
+    })
+    sess.on('trackAdded', () => {
+      this.updateMedia(user, sess)
+    })
+  }
+
+  initUser = (user) => {
     let domain = 'sipjs.onsip.com'
     let uri = `${user}.${this.token}@${domain}`
     let configuration = {
-      media: {
-        remote: {
-          video: remoteVideoElement,
-          audio: remoteVideoElement
-        }
+      transportOptions: {
+        traceSip: true
       },
-      ua: {
-        traceSip: true,
-        uri,
-        displayName: user,
-        userAgentString: SIP.C.USER_AGENT + ' sipjs.com'
-      }
+      uri,
+      displayName: user,
+      register: true,
+      autostart: true,
+      userAgentString: SIP.C.USER_AGENT + ' sipjs.com'
     }
-    //let ua = new SIP.UA(configuration.ua)
-    let simple = new SIP.Web.Simple(configuration)
+    let ua = new SIP.UA(configuration.ua)
 
-    // Adjust the style of the demo based on what is happening
-    simple.on('ended', () => {
-      remoteVideoElement.style.visibility = 'hidden'
-      this.setState(old => {
-        old.buttonTag[user] = 'start'
-        return old
-      })
+    ua.on('registered', () => {
+      alert('registered:' + user)
+      this.log('registered', user)
     })
-
-    simple.on('connected', () => {
-      remoteVideoElement.style.visibility = 'visible'
-      this.setState(old => {
-        old.buttonTag[user] = 'hung up'
-        return old
-      })
+    ua.on('invite', (session) => {
+      session.accept()
+      this[`session_${user}`] = session
+      this.initSessEvt(user)
     })
-
-    simple.on('ringing', () => {
-      simple.answer()
-    })
-
-    simple.on('trackAdded', this.onTrackAdded)
+    ua.start()
+    this[`ua_${user}`] = ua
     this[`uri_${user}`] = uri
-    this[`session_${user}`] = simple
-  }
-
-  onTrackAdded = () => {
-    this.log('track add')
   }
 
   log = (...msgs) => {
@@ -122,29 +180,41 @@ export default class ErrorBoundary extends React.Component {
         token + ';' + 'expires=' + d.toUTCString() + ';'
     }
     this.token = token
-    this.users.forEach(user => {
-      let otherUser = this.getOtherName(user)
-      this.initUser(user, `video-of-${otherUser}`)
+    this.users.forEach(this.initUser)
+  }
+
+  onChange = (e, name) => {
+    let val = e.target.value
+    this.setState(old => {
+      old.text[name] = val
+      return old
     })
   }
 
-  onClickName = name => {
-    let simple = this[`session_${name}`]
-    let {state} = simple
-    let otherName = this.getOtherName(name)
-    let targetURI = this[`uri_${otherName}`]
-    if (
-      state === SIP.Web.Simple.C.STATUS_NULL ||
-      state === SIP.Web.Simple.C.STATUS_COMPLETED
-    ) {
-      simple.call(targetURI)
-    } else {
-      simple.hangup()
+  replace = async (name) => {
+    this.setState(old => {
+      old.isLoading[name] = true
+    })
+    let text = this.state.text[name]
+    let audioURI = await getVoiceFromText(text)
+    if (!audioURI) {
+      return
     }
+    audioURI = audioURI.uri
+    let audioElem = document.getElementById(
+      `hide-audio-${name}`
+    )
+    audioElem.src = audioURI
+    console.log(audioElem)
   }
 
   renderSection = (name) => {
-    let tag = this.state.buttonTag[name] || 'start'
+    let connected = !!this.state.connected[name]
+    let tag = connected
+      ? 'hung up'
+      : 'call'
+    let text = this.state.text[name]
+    let isLoading = this.state.isLoading[name]
     return (
       <Card className="mg1b">
         <div class="demo-view pd1y">
@@ -158,6 +228,26 @@ export default class ErrorBoundary extends React.Component {
           </Button>
         </div>
         <h4>{name}'s View</h4>
+        <div className="pd1y">
+          <Input
+            value={text}
+            onChange={e => this.onChange(e, name)}
+            addonAfter={
+              <span
+                onClick={() => this.replace(name)}
+              >
+                {
+                  isLoading
+                    ? <Icon type="loading" />
+                    : 'replace with text audio'
+                }
+              </span>
+            }
+          />
+        </div>
+        <div className="hide">
+          <audio id={`hide-audio-${name}`} />
+        </div>
       </Card>
     )
   }
@@ -165,7 +255,7 @@ export default class ErrorBoundary extends React.Component {
   render() {
     return (
       <div className="main">
-        <h1>auto-tel</h1>
+        <h1>auto-tel0</h1>
         <div id="content-video-audio">
           <div id="log">
             {

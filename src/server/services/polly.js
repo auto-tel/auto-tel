@@ -18,7 +18,8 @@ const Polly = new AWS.Polly({
 })
 
 const params = {
-  OutputFormat: 'ogg_vorbis',
+  OutputFormat: 'mp3',
+  TextType: 'text',
   VoiceId: config.VoiceId
 }
 
@@ -33,11 +34,12 @@ const getAudioBuffer = (text) => {
         if (err) {
           return reject(err)
         }
+        console.log(data.AudioStream.write)
         if (
           data ||
           data.AudioStream instanceof Buffer
         ) {
-          return resolve(data)
+          return resolve(data.AudioStream)
         } else {
           reject(
             new Error('polly api returns no data')
@@ -49,10 +51,10 @@ const getAudioBuffer = (text) => {
 }
 
 const createPathFromMD5 = (md5) => {
-  return cwd + '/data/' + md5 + '.ogg'
+  return cwd + '/data/' + md5 + '.mp3'
 }
 const createURLFromMD5 = (md5, cdn) => {
-  return cdn + '/data/' + md5 + '.ogg'
+  return cdn + '/data/' + md5 + '.mp3'
 }
 
 export const getAudioResouce = async (text, cdn) => {

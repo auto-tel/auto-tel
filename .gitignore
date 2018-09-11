@@ -28,6 +28,7 @@ package-lock.json
 /app/version
 /work/
 /data/*.ogg
+/data/*.mp3
 /local-electron-builder.json
 user-config.json
 localstorage.json
