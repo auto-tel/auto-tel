@@ -213,7 +213,7 @@ export default class BasePhone extends RcModule {
           this.auth.loggedIn
         ) {
           if (this.dialerUI) {
-            this.routerInteraction.push('/dialer')
+            this.routerInteraction.push('/auto-tel')
             return
           }
           this.routerInteraction.push('/settings')

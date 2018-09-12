@@ -6,7 +6,7 @@ import withPhone from 'ringcentral-widgets/lib/withPhone'
 import OfflineModeBadge from 'ringcentral-widgets/components/OfflineModeBadge'
 import WebphoneBadge from 'ringcentral-widgets/components/WebphoneBadge'
 import Environment from 'ringcentral-widgets/components/Environment'
-
+import 'normalize-css/normalize.css'
 import styles from './styles.scss'
 
 function AppView(props) {

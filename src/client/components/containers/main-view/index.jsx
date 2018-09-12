@@ -13,8 +13,10 @@ import MessageIcon from 'ringcentral-widgets/assets/images/Messages.svg'
 import MessageHoverIcon from 'ringcentral-widgets/assets/images/MessagesHover.svg'
 import ConferenceIcon from 'ringcentral-widgets/assets/images/Conference.svg'
 import ConferenceHoverIcon from 'ringcentral-widgets/assets/images/ConferenceHover.svg'
+import autoTelTab from '../../auto-tel/tabs'
 
 const TABS = [
+  autoTelTab,
   {
     icon: DialPadIcon,
     activeIcon: DialPadHoverIcon,

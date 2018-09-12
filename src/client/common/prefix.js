@@ -1,1 +1,1 @@
-export default 'auto-tel'
+export default window.et.prefix

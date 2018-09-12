@@ -266,7 +266,7 @@ var config = {
           let pth = req.path
           if (
             (
-              /(\.json|\.jpg|\.png|\.css)$/.test(pth) &&
+              /(\.json|\.jpg|\.png|\.css|font\/)$/.test(pth) &&
               !/^\/static\//.test(pth) &&
               !/^\/_bc\//.test(pth)
             ) ||

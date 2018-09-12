@@ -9,7 +9,17 @@ let config = {
     appKey: '', //ringcentral AppKey
     appSecret: 'process.env.RINGCENTRAL_CLIENT_SECRET', //ringcentral AppSecret
     server: 'https://platform.devtest.ringcentral.com',
-    redirectUri: 'http://localhost:5370/redirect.html'
+    redirectUri: 'http://localhost:5370/redirect.html',
+    prefix: 'auto-tel', //for localstorage-prefix
+    brand: {
+      id: '1210',
+      brandCode: 'rc',
+      code: 'rc',
+      name: 'RingCentral',
+      appName: 'RingCentral',
+      fullName: 'RingCentral'
+    }
+
   },
   host: 'localhost',
   port: process.env.PORT || 4370,

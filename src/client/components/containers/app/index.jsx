@@ -29,6 +29,8 @@ import MainView from '../main-view'
 import AppView from '../app-view'
 import ThirdPartyConferenceInviteButton from '../../third-party-conference-invite-button'
 
+import AutoTel from '../../auto-tel'
+
 export default function App({
   phone,
   hostingUrl
@@ -100,6 +102,15 @@ export default function App({
                 callingSettingsUrl="/settings/calling"
                 showAudio
                 showFeedback={false}
+              />
+            )}
+          />
+          <Route
+            path="/auto-tel"
+            component={routerProps => (
+              <AutoTel
+                phone={phone}
+                params={routerProps.location.query}
               />
             )}
           />
