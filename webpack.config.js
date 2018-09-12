@@ -165,7 +165,7 @@ var config = {
       },
       {
         test: /\.woff|\.woff2|.eot|\.ttf/,
-        use: 'url-loader?limit=15000&publicPath=./&name=fonts/[name]_[hash].[ext]'
+        use: 'url-loader?limit=15000&publicPath=../&name=fonts/[name]_[hash].[ext]'
       },
       {
         test: /\.(png|jpg|svg|gif)$/,

@@ -9,7 +9,7 @@ import CryptoJS from 'crypto-js'
 
 const fsPromises = fs.promises
 const cwd = process.cwd()
-const MAXLEN = '200'
+const MAXLEN = 400
 
 // Create an Polly client
 const Polly = new AWS.Polly({

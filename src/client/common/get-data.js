@@ -5,6 +5,9 @@ import fetch from './fetch'
  * @param {text} text
  */
 
-export const getVoiceFromText = text => {
-  return fetch.get('/api/polly', {text})
+export const getVoiceFromText = async text => {
+  let res = await fetch.get('/api/polly', {text})
+  if (res) {
+    return res.uri
+  }
 }
