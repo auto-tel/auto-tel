@@ -11,19 +11,19 @@ import actionTypes from './action-types'
     { dep: 'DetailedPresence' },
     { dep: 'GlobalStorage' },
     { dep: 'Storage' },
-    { dep: 'LocalPresenceOptions', optional: true, spread: true },
-  ],
+    { dep: 'LocalPresenceOptions', optional: true, spread: true }
+  ]
 })
 export default class LocalPresence extends RcModule {
   constructor({
     detailedPresence,
     storage,
     globalStorage,
-    ...options,
+    ...options
   }) {
     super({
       actionTypes,
-      ...options,
+      ...options
     })
 
     this._detailedPresence = detailedPresence
@@ -37,11 +37,11 @@ export default class LocalPresence extends RcModule {
 
     this._globalStorage.registerReducer({
       key: this._globalStorageKey,
-      reducer: getCustomizeDataReducer(this.actionTypes),
+      reducer: getCustomizeDataReducer(this.actionTypes)
     })
     this._storage.registerReducer({
       key: this._storageKey,
-      reducer: getPersonalCustomizeDataReducer(this.actionTypes),
+      reducer: getPersonalCustomizeDataReducer(this.actionTypes)
     })
 
     // your codes here
@@ -56,7 +56,7 @@ export default class LocalPresence extends RcModule {
       })
     } else if (this._shouldReset()) {
       this.store.dispatch({
-        type: this.actionTypes.resetSuccess,
+        type: this.actionTypes.resetSuccess
       })
     }
     if (this.ready) {
@@ -86,14 +86,14 @@ export default class LocalPresence extends RcModule {
   updateCustomizeData(data) {
     this.store.dispatch({
       type: this.actionTypes.saveCustomizeData,
-      data,
+      data
     })
   }
 
   updatePersonalCustomizeData(data) {
     this.store.dispatch({
       type: this.actionTypes.savePersonalCustomizeData,
-      data,
+      data
     })
   }
 
