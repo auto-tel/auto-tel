@@ -1,6 +1,7 @@
 
 const webpack = require('webpack')
 const {identity} = require('lodash')
+const autoprefixer = require('autoprefixer')
 const sysConfigDefault = require('./src/server/config')
 const packThreadCount = sysConfigDefault.devCPUCount // number
 const BabiliPlugin = require('babili-webpack-plugin')
@@ -21,22 +22,25 @@ const happyConf = {
   verbose: true
 }
 let version = pack.version + '-' + git.long()
-
+const url = `http://localhost:${sysConfigDefault.devPort}`
 const extractTextPlugin1 = new MiniCssExtractPlugin({
   filename: 'css/[name].styles.css'
 })
 
-const pug = {
-  loader: 'pug-html-loader',
-  options: {
-    data: {
-      version,
-      _global: {
-        version
-      }
-    }
-  }
-}
+// const confs = {
+//   ...sysConfigDefault.site,
+//   cdn: url,
+//   host: url
+// }
+// const pug = {
+//   loader: 'pug-html-loader',
+//   options: {
+//     data: {
+//       ...confs,
+//       _global: confs
+//     }
+//   }
+// }
 
 const stylusSettingPlugin =  new webpack.LoaderOptionsPlugin({
   test: /\.styl$/,
@@ -50,19 +54,23 @@ var config = {
   entry: {
     'auto-tel': './src/client/entry/index.jsx',
     basic: './src/client/entry/basic.jsx',
-    index: './src/views/index.pug'
+    //index: './src/views/index.pug',
+    'proxy-js': './src/client/entry/proxy.jsx',
+    'redirect-js': './src/client/entry/redirect.jsx'
+    //proxy: './src/views/proxy.pug',
+    //redirect: './src/views/redirect.pug'
   },
   output: {
-    path: __dirname + '/app/assets', // 输出文件目录
-    filename: 'js/[name].bundle.js', // 输出文件名
+    path: __dirname + '/app/assets',
+    filename: 'js/[name].bundle.js',
     publicPath: '/',
     chunkFilename: 'js/[name].' + version + '.js',
     libraryTarget: 'var'
   },
   externals: {
     'react': 'React',
-    'react-dom': 'ReactDOM',
-    'sip.js': 'SIP'
+    'react-dom': 'ReactDOM'
+    //'sip.js': 'SIP'
   },
   watch: true,
   resolve: {
@@ -133,18 +141,92 @@ var config = {
         ]
       },
       {
-        test: /\.(png|jpg|svg)$/,
-        use: ['url-loader?limit=10192&name=images/[hash].[ext]']
+        test: /\.css$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it use publicPath in webpackOptions.output
+              publicPath: '../'
+            }
+          },
+          //'style-loader',
+          'css-loader'
+        ]
       },
       {
-        test: /\.pug$/,
+        test: /\.svg/,
+        exclude: /font|src(\/|\\)assets(\/|\\)images/,
         use: [
-          'file-loader?name=index.html',
-          'concat-loader',
-          'extract-loader',
-          'html-loader',
-          pug
+          'babel-loader',
+          'react-svg-loader'
         ]
+      },
+      {
+        test: /\.woff|\.woff2|.eot|\.ttf/,
+        use: 'url-loader?limit=15000&publicPath=./&name=fonts/[name]_[hash].[ext]'
+      },
+      {
+        test: /\.(png|jpg|svg|gif)$/,
+        exclude: /ringcentral-widgets(\/|\\)assets(\/|\\)images(\/|\\).+\.svg/,
+        use: ['url-loader?limit=10192&name=images/[hash].[ext]']
+      },
+      // {
+      //   test: /\.pug$/,
+      //   use: [
+      //     'file-loader?name=index.html',
+      //     'concat-loader',
+      //     'extract-loader',
+      //     'html-loader',
+      //     pug
+      //   ]
+      // },
+      {
+        test: /\.md$/,
+        use: 'raw-loader'
+      },
+      {
+        test: /\.sass|\.scss/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // you can specify a publicPath here
+              // by default it use publicPath in webpackOptions.output
+              publicPath: '../'
+            }
+          },
+          //'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              localIdentName: '[folder]_[local]',
+              modules: true
+            }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: function () {
+                return [
+                  autoprefixer
+                ]
+              }
+            }
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              outputStyle: 'expanded',
+              includePaths: ['src/client/css', 'node_modules']
+            }
+          }
+        ]
+      },
+      {
+        test: /\.ogg$/,
+        use: 'file-loader?publicPath=./&name=audio/[name]_[hash].[ext]'
       }
     ]
   },
@@ -157,7 +239,7 @@ var config = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new OpenBrowserPlugin({
-      url: `http://localhost:${sysConfigDefault.devPort}`
+      url
     }),
     new LodashModuleReplacementPlugin(),
     stylusSettingPlugin,
