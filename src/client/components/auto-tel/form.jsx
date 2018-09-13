@@ -28,8 +28,8 @@ class AutoTelForm extends Component {
   render() {
     const {getFieldDecorator} = this.props.form
     const {
-      numbers = '(650)437-7931 (650)437-7931 (650)437-7931',
-      text = 'hello, this is a automatic phone call message from ringcentral, ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring ring'
+      numbers,
+      text
     } = this.props
     return (
       <Form onSubmit={this.handleSubmit} className="form-wrap">
