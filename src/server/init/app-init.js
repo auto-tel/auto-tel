@@ -55,6 +55,10 @@ export default function init() {
     mount('/data', serve(cwd + '/data', staticOption()))
   )
 
+  app.use(
+    mount('/', serve(cwd + '/public', staticOption()))
+  )
+
   // body
   app.use(bodyparser)
 
@@ -97,7 +101,7 @@ export default function init() {
 
   //pug template
   new Pug({
-    viewPath: cwd + '/src/views',
+    viewPath: cwd + (isProduction ? '/views' : '/src/views'),
     debug: !isProduction,
     pretty: !isProduction,
     compileDebug: !isProduction,

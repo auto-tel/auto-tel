@@ -1,4 +1,4 @@
-/* eslint-disable */
+// eslint-disable */
 /**
  * simplified webphone constructor
  * from ringcentral-web-phone
@@ -175,7 +175,7 @@ function WebPhone(_regData, _options) {
       //reconnectionTimeout
       //keepAliveInterval
       //keepAliveDebounce
-      traceSip: true,
+      traceSip: true
     },
     //wsServerMaxReconnection: options.wsServerMaxReconnection || 3,
     //connectionRecoveryMaxInterval: options.connectionRecoveryMaxInterval || 60,
@@ -246,7 +246,7 @@ function sendMessage(to, messageData) {
   return new Promise(function (resolve, reject) {
     let message = userAgent.message(to, messageData, sipOptions)
 
-    message.once('accepted', function (response, cause) {
+    message.once('accepted', function () {
       resolve()
     })
     message.once('failed', function (response, cause) {
@@ -276,9 +276,9 @@ function onMessage(e) {
   }
 
   if (data.match(/CSeq:\s*\d+\s+MESSAGE/i)) {
-    let re = new RegExp(this.ua.configuration.viaHost + ':\\d+', "g")
+    let re = new RegExp(this.ua.configuration.viaHost + ':\\d+', 'g')
     let newData = e.data.replace(re, this.ua.configuration.viaHost)
-    Object.defineProperty(e, "data", {
+    Object.defineProperty(e, 'data', {
       value: newData,
       writable: false
     })
@@ -367,138 +367,7 @@ function patchSession(session) {
 
 }
 
-/*--------------------------------------------------------------------------------------------------------------------*/
 
-function patchIncomingSession(session) {
-  try {
-    parseRcHeader(session)
-  } catch (e) {
-    session.logger.error('Can\'t parse RC headers from invite request due to ' + e)
-  }
-  session.canUseRCMCallControl = canUseRCMCallControl
-  session.createSessionMessage = createSessionMessage
-  session.sendSessionMessage = sendSessionMessage
-  session.sendReceiveConfirm = sendReceiveConfirm
-  session.toVoicemail = toVoicemail
-  session.replyWithMessage = replyWithMessage
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-function parseRcHeader(session) {
-  let prc = session.request.headers['P-Rc']
-  if (prc && prc.length) {
-    let rawInviteMsg = prc[0].raw
-    let parser = new DOMParser()
-    let xmlDoc = parser.parseFromString(rawInviteMsg, 'text/xml')
-    let hdrNode = xmlDoc.getElementsByTagName('Hdr')[0]
-
-    if (hdrNode) {
-      session.rcHeaders = {
-        sid: hdrNode.getAttribute('SID'),
-        request: hdrNode.getAttribute('Req'),
-        from: hdrNode.getAttribute('From'),
-        to: hdrNode.getAttribute('To'),
-      }
-    }
-  }
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-/**
- * @this {SIP.Session}
- * @return {Bool}
- */
-function canUseRCMCallControl() {
-  return !!this.rcHeaders
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-/**
- * @this {SIP.Session}
- * @param {object} options
- * @return {String}
- */
-function createSessionMessage(options) {
-  if (!this.rcHeaders) {
-    return undefined
-  }
-  extend(options, {
-    sid: this.rcHeaders.sid,
-    request: this.rcHeaders.request,
-    from: this.rcHeaders.to,
-    to: this.rcHeaders.from,
-  })
-  return this.ua.createRcMessage(options)
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-/**
- * @this {SIP.Session}
- * @param {object} options
- * @return {Promise}
- */
-function sendSessionMessage(options) {
-  if (!this.rcHeaders) {
-    return Promise.reject(new Error('Can\'t send SIP MESSAGE related to session: no RC headers available'))
-  }
-
-  let to = this.rcHeaders.from
-
-  return this.ua.sendMessage(to, this.createSessionMessage(options))
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-/**
- * @this {SIP.Session}
- * @return {Promise}
- */
-function sendReceiveConfirm() {
-  return this.sendSessionMessage(messages.receiveConfirm)
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-/**
- * @this {SIP.Session}
- * @return {Promise}
- */
-function toVoicemail() {
-  let session = this
-  return session._sendReceiveConfirmPromise.then(function () {
-    return session.sendSessionMessage(messages.toVoicemail)
-  })
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-/**
- * @this {SIP.Session}
- * @param {object} replyOptions
- * @return {Promise}
- */
-function replyWithMessage(replyOptions) {
-  let body = 'RepTp="' + replyOptions.replyType + '"'
-
-  if (replyOptions.replyType === 0) {
-    body += ' Bdy="' + replyOptions.replyText + '"'
-  } else if (replyOptions.replyType === 1) {
-    body += ' Vl="' + replyOptions.timeValue + '"'
-    body += ' Units="' + replyOptions.timeUnits + '"'
-    body += ' Dir="' + replyOptions.callbackDirection + '"'
-  }
-  let session = this
-  return session._sendReceiveConfirmPromise.then(function () {
-    return session.sendSessionMessage({
-      reqid: messages.replyWithMessage.reqid,
-      body: body
-    })
-  })
-}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 
@@ -526,7 +395,7 @@ function sendReceive(session, command, options) {
       body: JSON.stringify({
         request: command
       }),
-      extraHeaders: extraHeaders,
+      extraHeaders,
       receiveResponse: function (response) {
         let timeout = null
         if (response.status_code === 200) {
@@ -545,7 +414,7 @@ function sendReceive(session, command, options) {
 
               if (obj.response && obj.response.command === command.command) {
                 if (obj.response.result) {
-                  if (obj.response.result.code == 0) {
+                  if (obj.response.result.code === 0) {
                     return resolve(obj.response.result)
                   } else {
                     return reject(obj.response.result)
@@ -578,6 +447,7 @@ function sendReceive(session, command, options) {
 function register(options) {
   options = options || {}
   options.extraHeaders = (options.extraHeaders || []).concat(this.defaultHeaders)
+  console.log('regi options', options)
   return this.__register.call(this, options)
 }
 
@@ -592,7 +462,7 @@ function unregister(options) {
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 function sendRequest(type, config) {
-  if (type == SIP.C.PRACK) {
+  if (type === SIP.C.PRACK) {
     // type = SIP.C.ACK
     return this
   }
@@ -805,17 +675,11 @@ function unhold() {
  * @return {Promise}
  */
 function blindTransfer(target, options) {
-
   options = options || {}
-
   let session = this
-  let extraHeaders = options.extraHeaders || []
-  let originalTarget = target
-
-  return new Promise(function (resolve, reject) {
-    //Blind Transfer is taken from SIP.js source
-    return session.refer(target, options)
-  })
+  return Promise.resolve(
+    session.refer(target, options)
+  )
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -892,7 +756,7 @@ function forward(target, acceptOptions, transferOptions) {
   return session.accept(acceptOptions)
     .then(function () {
 
-      return new Promise(function (resolve, reject) {
+      return new Promise(function (resolve) {
         interval = setInterval(function () {
           if (session.status === 12) {
             clearInterval(interval)
@@ -1016,54 +880,6 @@ function unmute(silent) {
 function onLocalHold() {
   let session = this
   return session.local_hold
-}
-
-/*--------------------------------------------------------------------------------------------------------------------*/
-
-
-function addTrack() {
-
-  let session = this
-  let pc = session.sessionDescriptionHandler.peerConnection
-
-  // Gets remote tracks
-  let remoteAudio = session.media.remote
-  let remoteStream = new MediaStream()
-
-  if (pc.getReceivers) {
-    pc.getReceivers().forEach(function (receiver) {
-      let rtrack = receiver.track
-      if (rtrack) {
-        remoteStream.addTrack(rtrack)
-      }
-    })
-  } else {
-    remoteStream = pc.getRemoteStreams()[0]
-  }
-  remoteAudio.srcObject = remoteStream
-  remoteAudio.play().catch(function () {
-    session.logger.log('local play was rejected')
-  })
-
-  // Gets local tracks
-  let localAudio = session.media.local
-  let localStream = new MediaStream()
-
-  if (pc.getSenders) {
-    pc.getSenders().forEach(function (sender) {
-      let strack = sender.track
-      if (strack && strack.kind === 'audio') {
-        localStream.addTrack(strack)
-      }
-    })
-  } else {
-    localStream = pc.getLocalStreams()[0]
-  }
-  localAudio.srcObject = localStream
-  localAudio.play().catch(function () {
-    session.logger.log('local play was rejected')
-  })
-
 }
 
 export default WebPhone

@@ -9,6 +9,8 @@ import AutoTelForm from './form'
 import {getVoiceFromText} from '../../common/get-data'
 import {generate} from 'shortid'
 import CallHandler from './call-handler'
+import copy from 'json-deep-copy'
+import _ from 'lodash'
 import './main.styl'
 
 const {TabPane} = Tabs
@@ -25,9 +27,55 @@ export default class Main extends React.Component {
     working: false
   }
 
+  pause = () => {
+    this.setState({
+      curretTarget: null,
+      working: false
+    })
+  }
+
+  resume = () => {
+    this.setState({
+      working: true,
+      curretTarget: this.state.tasks[0]
+    })
+  }
+
   onChange = (e, name) => {
     this.setState({
       [name]: e.target.value
+    })
+  }
+
+  onReportId = null
+  //this means one phone call finished
+  //lets handle the result
+  onReport = ({result, message, target = {}}) => {
+    if (!this.state.working || !target.id) {
+      return
+    }
+    if (this.onReportId === target.id) {
+      return
+    }
+    this.onReportId = target.id
+    this.setState(old => {
+      let {id} = target
+      let tasks = copy(old.tasks).filter(t => t.id !== id)
+      let finalTarget = {
+        ...target,
+        result,
+        message
+      }
+      if (result === 'success') {
+        old.success.unshift(finalTarget)
+      } else {
+        old.failed.unshift(finalTarget)
+      }
+      old.tasks = tasks
+      old.curretTarget = tasks[0]
+      return old
+    }, () => {
+      this.onReportId = ''
     })
   }
 
@@ -76,14 +124,14 @@ export default class Main extends React.Component {
     return (
       <div className="current-target pd1">
         calling {number}...when connect, will play this audio clip:
-        <audio src={voiceURI} className="iblock" />
+        <audio src={voiceURI} className="iblock" controls />
       </div>
     )
   }
 
   styleMap = {
     tasks: {
-      ackgroundColor: '#fff',
+      backgroundColor: '#fff',
       color: '#999',
       boxShadow: '0 0 0 1px #d9d9d9 inset'
     },
@@ -98,7 +146,9 @@ export default class Main extends React.Component {
       <Badge
         count={arr.length}
         style={this.styleMap[name]}
-      >{name}</Badge>
+      >
+        <span className="iblock pd2x">{name}</span>
+      </Badge>
     )
   }
 
@@ -109,12 +159,12 @@ export default class Main extends React.Component {
       id
     } = item
     return (
-      <div className="fix" key={id}>
+      <div className="fix pd2" key={id}>
         <div className="fleft">
           {number}
         </div>
         <div className="fright">
-          <audio src={voiceURI} />
+          <audio src={voiceURI} controls />
         </div>
       </div>
     )
@@ -201,7 +251,7 @@ export default class Main extends React.Component {
     return (
       <div className="auto-tel-main pd2">
         <p className="mg1b borderb">
-          Auto call numbers and play message from text.
+          Automatically call numbers and play message from text.
         </p>
         <AutoTelForm
           queue={this.queue}
@@ -211,6 +261,7 @@ export default class Main extends React.Component {
         <CallHandler
           phone={this.props.phone}
           target={curretTarget}
+          report={this.onReport}
         />
       </div>
     )

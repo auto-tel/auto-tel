@@ -34,7 +34,6 @@ const getAudioBuffer = (text) => {
         if (err) {
           return reject(err)
         }
-        console.log(data.AudioStream.write)
         if (
           data ||
           data.AudioStream instanceof Buffer

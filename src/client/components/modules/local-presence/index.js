@@ -64,10 +64,6 @@ export default class LocalPresence extends RcModule {
       if (this._lastCalls !== this._detailedPresence.calls) {
         this._lastCalls = this._detailedPresence.calls
         console.log(this._lastCalls)
-        let call = _.get(this._lastCalls, [0]) || {}
-        if (call.telephonyStatus === 'CallConnected') {
-          PubSub.publish('connected')
-        }
       }
     }
   }

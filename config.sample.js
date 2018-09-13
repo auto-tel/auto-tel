@@ -7,10 +7,10 @@ module.exports = {
   site: {
     // env: '',
     // siteName: '',
-    // appKey: '', //ringcentral AppKey
-    // appSecret: 'process.env.RINGCENTRAL_CLIENT_SECRET', //ringcentral AppSecret
-    // server: 'https://platform.devtest.ringcentral.com',
-    // redirectUri: 'http://localhost:5370/redirect.html'
+    appKey: , //ringcentral AppKey required
+    appSecret: , //ringcentral AppSecret required
+    server: 'https://platform.devtest.ringcentral.com', //ringcentral server required
+    redirectUri: 'http://localhost:5370/redirect.html' //redirect url, required
   }
   // host: 'localhost',
   // port: process.env.PORT || 4370,

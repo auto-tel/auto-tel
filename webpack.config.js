@@ -61,7 +61,7 @@ var config = {
     //redirect: './src/views/redirect.pug'
   },
   output: {
-    path: __dirname + '/app/assets',
+    path: __dirname + '/public',
     filename: 'js/[name].bundle.js',
     publicPath: '/',
     chunkFilename: 'js/[name].' + version + '.js',
@@ -123,7 +123,7 @@ var config = {
             options: {
 
               //relative path to your css path
-              path: '../../_bc/auto-tel-resources/res/fonts',
+              path: '../../_bc/@auto-tel/auto-tel-resources/res/fonts',
 
               //version, will add to icon source url to help clear cache
               version: pack.devDependencies.antd
@@ -251,7 +251,7 @@ var config = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept'
     },
-    contentBase: path.join(__dirname, 'app/assets/'),
+    contentBase: path.join(__dirname, 'public/'),
     historyApiFallback: true,
     hot: true,
     inline: true,
@@ -299,6 +299,7 @@ if (env === 'production') {
     // }),
     new BabiliPlugin()
   ]
+  config.optimization = {}
   config.mode = 'production'
   delete config.watch
   delete config.devtool
