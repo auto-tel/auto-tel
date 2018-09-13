@@ -1,0 +1,8 @@
+apps:
+    name: auto-tel.html5beta.com
+    script: ./run-watch.sh
+    error_file: ./logs/auto-tel.html5beta.com_err.log
+    out_file: ./logs/auto-tel.html5beta.com_out.log
+    pid_file: ./pids/auto-tel.html5beta.com.pid
+    env:
+        NODE_ENV: production
