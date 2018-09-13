@@ -1,7 +1,5 @@
 import RcModule from 'ringcentral-integration/lib/RcModule'
 import { Module } from 'ringcentral-integration/lib/di'
-import _ from 'lodash'
-import PubSub from 'pubsub-js'
 
 import getReducer, { getCustomizeDataReducer, getPersonalCustomizeDataReducer } from './get-reducer'
 import actionTypes from './action-types'

@@ -10,7 +10,6 @@ import {getVoiceFromText} from '../../common/get-data'
 import {generate} from 'shortid'
 import CallHandler from './call-handler'
 import copy from 'json-deep-copy'
-import _ from 'lodash'
 import './main.styl'
 
 const {TabPane} = Tabs

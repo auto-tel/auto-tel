@@ -479,7 +479,7 @@ function sendRequest(type, config) {
  */
 function setRecord(session, flag) {
 
-  let message = !!flag ?
+  let message = flag ?
     messages.startRecord :
     messages.stopRecord
 
