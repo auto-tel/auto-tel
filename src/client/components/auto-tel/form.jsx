@@ -32,7 +32,11 @@ class AutoTelForm extends Component {
       text
     } = this.props
     return (
-      <Form onSubmit={this.handleSubmit} className="form-wrap">
+      <Form
+        onSubmit={this.handleSubmit}
+        className="form-wrap"
+        layout="vertical"
+      >
         <FormItem
           {...formItemLayout}
           label="numbers"

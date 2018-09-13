@@ -1,6 +1,6 @@
 <h1 align="center">
     <a href="https://github.com/auto-tel/auto-tel">
-        <img src="https://raw.githubusercontent.com/auto-tel/auto-tel-resources/master/static/img/auto-tel.png", alt="" />
+        <img src="https://raw.githubusercontent.com/auto-tel/auto-tel-resources/master/static/img/auto-tel.png", alt="" style="max-height:200px"/>
     </a>
 </h1>
 
@@ -8,7 +8,7 @@
 
 ## Introduction
 
-auto-tel is a demo powered by aws.polly and RingCentral APIs. auto-tel can automatically make phone calls to target numbers, after connected, read speciafic text to target number.
+auto-tel is a demo powered by aws.polly and RingCentral APIs. auto-tel can automatically make phone calls to target numbers, after connected, read specific text to target number.
 
 ## Prerequisites
 - latest Chrome browser
@@ -25,7 +25,7 @@ refer to https://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.
 
 refer to https://developer.ringcentral.com
 
-# dev run
+## dev run
 ```bash
 git clone https://github.com/auto-tel/auto-tel.git
 cd auto-tel

@@ -249,7 +249,7 @@ export default class Main extends React.Component {
     } = this.state
     return (
       <div className="auto-tel-main pd2">
-        <p className="mg1b borderb">
+        <p className="mg2b borderb pd1t pd2b">
           Automatically call numbers and play message from text.
         </p>
         <AutoTelForm

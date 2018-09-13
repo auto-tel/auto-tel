@@ -1,6 +1,7 @@
 apps:
     name: auto-tel.html5beta.com
-    script: ./run-watch.sh
+    script: ./app/app.js
+    exec_mode : cluster
     error_file: ./logs/auto-tel.html5beta.com_err.log
     out_file: ./logs/auto-tel.html5beta.com_out.log
     pid_file: ./pids/auto-tel.html5beta.com.pid

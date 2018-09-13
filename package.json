@@ -13,6 +13,7 @@
     "ver": "node bin/generate-version.js",
     "clean": "rm -rf views app public/js public/fonts public/images public/audio public/css",
     "pack": "node bin/pack",
+    "pack-only": "node bin/pack-only",
     "build-server": "./node_modules/.bin/babel src/server --out-dir app --source-maps",
     "preinstall": "rm -rf package-lock.json",
     "postinstall": "node bin/post-install",
@@ -41,7 +42,6 @@
     "antd": "3.6.6",
     "antd-icon-loader": "1.0.0",
     "autoprefixer": "9.1.5",
-    "aws-sdk": "2.311.0",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
     "babel-eslint": "8.2.3",
@@ -103,7 +103,6 @@
     "react-router": "3.2.1",
     "react-router-redux": "4.0.7",
     "react-svg-loader": "2.1.0",
-    "react-table": "6.8.6",
     "ringcentral": "3.2.0",
     "ringcentral-client": "1.0.0-beta.1",
     "ringcentral-integration": "0.9.3",
@@ -114,13 +113,13 @@
     "style-loader": "0.21.0",
     "stylus": "0.54.5",
     "stylus-loader": "3.0.2",
-    "useragent": "2.3.0",
     "webpack": "4.16.5",
     "webpack-cli": "2.1.4",
     "webpack-dev-server": "3.1.5"
   },
   "dependencies": {
     "@auto-tel/auto-tel-resources": "0.0.2",
+    "aws-sdk": "2.311.0",
     "bluebird": "3.5.1",
     "body-parser": "1.18.3",
     "cors": "2.8.4",
@@ -142,6 +141,7 @@
     "react-dom": "16.4.2",
     "recursive-assign": "0.2.0",
     "shortid": "2.2.8",
+    "useragent": "2.3.0",
     "uuid": "3.3.2"
   }
 }
