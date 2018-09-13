@@ -7,6 +7,8 @@ module.exports = {
   site: {
     // env: '',
     // siteName: '',
+    // host: 'https://xx.xx',
+    // cdn: 'https://xx.xx',
     appKey: , //ringcentral AppKey required
     appSecret: , //ringcentral AppSecret required
     server: 'https://platform.devtest.ringcentral.com', //ringcentral server required
