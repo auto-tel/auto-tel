@@ -12,6 +12,7 @@ echo('clean')
 exec('npm run clean')
 exec('npm run ver')
 exec('npm run build')
+exec('npm run build-server')
 
 rm('-rf', 'work')
 mkdir('-p', 'work/auto-tel')
