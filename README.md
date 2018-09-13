@@ -1,6 +1,6 @@
 <h1 align="center">
     <a href="https://github.com/auto-tel/auto-tel">
-        <img src="https://raw.githubusercontent.com/auto-tel/auto-tel-resources/master/static/img/auto-tel.png", alt="" style="max-height:200px"/>
+        <img src="https://raw.githubusercontent.com/auto-tel/auto-tel-resources/master/static/img/auto-tel.png", alt="" height="200" />
     </a>
 </h1>
 
