@@ -45,7 +45,12 @@ export default class CallProcess extends Component {
   }
 
   componentWillUnmount() {
-    this.stopCall()
+    this.unmounting = true
+    this.sess.terminate()
+  }
+
+  sess = {
+    terminate: () => null
   }
 
   p = 'phone.client.service.platform'
@@ -83,6 +88,9 @@ export default class CallProcess extends Component {
   }
 
   onRegister = () => {
+    if (this.unmounting) {
+      return
+    }
     this.setState({
       registered: true
     })
